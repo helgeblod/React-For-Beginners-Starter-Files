@@ -112,6 +112,7 @@ class App extends React.Component {
             removeFish={this.removeFish}
             loadSampleFishes={this.loadSampleFishes}
             fishes={this.state.fishes}
+            storeId={this.props.params.storeId}
             />
             </div>
         )

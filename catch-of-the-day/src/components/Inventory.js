@@ -10,10 +10,19 @@ class Inventory extends React.Component {
         this.authenticate = this.authenticate.bind(this);
         this.authenticateHandler = this.authenticateHandler.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.logout = this.logout.bind(this);
         this.state = {
             uid: null,
             owner: null
         }
+    }
+
+    componentDidMount() {
+        base.onAuth( (user) => {
+            if(user) {
+                this.authenticateHandler(null, { user });
+            }
+        });
     }
 
     handleChange(e, key){
@@ -25,11 +34,34 @@ class Inventory extends React.Component {
         this.props.updateFish(key, updatedFish);
     }
 
-    authenticateHandler(err, userData){
-        console.log(userData);
+    authenticateHandler(err, authData){
         if(err){
             console.log(err);
+            return;
         }
+
+        // Grab the store info
+        const storeRef = base.database().ref(this.props.storeId);
+
+        storeRef.once('value', (snapshot) => {
+            const data = snapshot.val() || {};
+            // Claim store if it's not owned by anyone
+            if(!data.owner) {
+                storeRef.set({
+                    owner: authData.user.uid
+                });
+            }
+
+            this.setState({
+                uid: authData.user.uid,
+                owner: data.owner || authData.user.uid
+            })
+        });
+    }
+
+    logout() {
+        base.unauth();
+        this.setState({ uid: null});
     }
 
     authenticate(provider){
@@ -67,7 +99,7 @@ class Inventory extends React.Component {
     }
 
     render () {
-        const logout = <button>Log out!</button>;
+        const logout = <button onClick={this.logout}>Log out!</button>;
         if (!this.state.uid){
             return (
                 <div>{this.renderLogin()}</div>
@@ -101,6 +133,7 @@ Inventory.propTypes = {
     removeFish: React.PropTypes.func.isRequired,
     addFish: React.PropTypes.func.isRequired,
     loadSampleFishes: React.PropTypes.func.isRequired,
+    storeId: React.PropTypes.string.isRequired,
 }
 
 
