@@ -1,11 +1,19 @@
 import React from 'react';
 import AddFishForm from './AddFishForm'
+import base from '../base'
 
 class Inventory extends React.Component {
     constructor () {
         super();
         this.renderInventory = this.renderInventory.bind(this);
+        this.renderLogin = this.renderLogin.bind(this);
+        this.authenticate = this.authenticate.bind(this);
+        this.authenticateHandler = this.authenticateHandler.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.state = {
+            uid: null,
+            owner: null
+        }
     }
 
     handleChange(e, key){
@@ -15,6 +23,29 @@ class Inventory extends React.Component {
             [e.target.name]: e.target.value
         }
         this.props.updateFish(key, updatedFish);
+    }
+
+    authenticateHandler(err, userData){
+        console.log(userData);
+        if(err){
+            console.log(err);
+        }
+    }
+
+    authenticate(provider){
+        base.authWithOAuthPopup(provider, this.authenticateHandler)
+    }
+
+    renderLogin(){
+        return (
+            <nav className="login">
+                <h2>Inventory</h2>
+                <p>Sign in to manage your store's inventory</p>
+                <button className="github" onClick={() => this.authenticate('github')}>Log in with Github</button>
+                <button className="facebook" onClick={() => this.authenticate('facebook')}>Log in with facebook</button>
+                <button className="twitter" onClick={() => this.authenticate('twitter')}>Log in with Twitter</button>
+            </nav>
+        )
     }
 
     renderInventory(key) {
@@ -36,9 +67,26 @@ class Inventory extends React.Component {
     }
 
     render () {
+        const logout = <button>Log out!</button>;
+        if (!this.state.uid){
+            return (
+                <div>{this.renderLogin()}</div>
+            )
+        }
+
+        if (this.state.uid !== this.state.owner) {
+            return (
+                <div>
+                    <p>Sorry, you are not the owner of this store 🙍</p>
+                    {logout}
+                </div>
+            )
+        }
+
         return (
             <div>
                 <h2>Inventory</h2>
+                {logout}
                 {Object.keys(this.props.fishes).map(this.renderInventory)}
                 <AddFishForm addFish={this.props.addFish} />
                 <button onClick={this.props.loadSampleFishes}>Load sample fishes</button>
@@ -46,5 +94,14 @@ class Inventory extends React.Component {
         )
     }
 }
+
+Inventory.propTypes = {
+    fishes: React.PropTypes.object.isRequired,
+    updateFish: React.PropTypes.func.isRequired,
+    removeFish: React.PropTypes.func.isRequired,
+    addFish: React.PropTypes.func.isRequired,
+    loadSampleFishes: React.PropTypes.func.isRequired,
+}
+
 
 export default Inventory;

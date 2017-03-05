@@ -88,34 +88,39 @@ class App extends React.Component {
     render () {
         return (
             <div className="catch-of-the-day">
-                <div className="menu">
-                    <Header tagline="Fresh Seafood Market"/>
-                    <ul className="list-of-fishes">
-                        {
-                            Object
-                                .keys(this.state.fishes)
-                                .map(key => <Fish key={key} index={key} details={this.state.fishes[key]} addToOrder={this.addToOrder} />)
-                        }
-                    </ul>
-                </div>
+            <div className="menu">
+            <Header tagline="Fresh Seafood Market"/>
+            <ul className="list-of-fishes">
+            {
+                Object
+                    .keys(this.state.fishes)
+                    .map(key => <Fish key={key} index={key} details={this.state.fishes[key]} addToOrder={this.addToOrder} />)
+            }
+            </ul>
+            </div>
 
-                <Order
-                    fishes={this.state.fishes}
-                    order={this.state.orders}
-                    removeFromOrder={this.removeFromOrder}
-                    params={this.state.params}
-                />
+            <Order
+            fishes={this.state.fishes}
+            order={this.state.orders}
+            removeFromOrder={this.removeFromOrder}
+            params={this.state.params}
+            />
 
-                <Inventory
-                    updateFish={this.updateFish}
-                    addFish={this.addFish}
-                    removeFish={this.removeFish}
-                    loadSampleFishes={this.loadSampleFishes}
-                    fishes={this.state.fishes}
-                />
+            <Inventory
+            updateFish={this.updateFish}
+            addFish={this.addFish}
+            removeFish={this.removeFish}
+            loadSampleFishes={this.loadSampleFishes}
+            fishes={this.state.fishes}
+            />
             </div>
         )
     }
 }
+
+
+App.propTypes = {
+    params: React.PropTypes.object.isRequired
+};
 
 export default App

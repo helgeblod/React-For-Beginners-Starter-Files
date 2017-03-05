@@ -14,6 +14,6 @@ const Header = (props) => {
           <h3 className="tagline"><span>{props.tagline}</span></h3>
         </header>
     )
-}
+};
 
 export default Header;
